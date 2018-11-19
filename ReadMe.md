@@ -1,6 +1,6 @@
 <h2>1. Objetivo</h2>
 
-El objetivo de esta práctica es que el alumno aprenda a modelar y resolver problemas tanto de satisfacibili- dad lógica (SAT) como de búsqueda heurística.
+El objetivo de esta práctica es que el alumno aprenda a modelar y resolver problemas tanto de satisfacibilidad lógica (SAT) como de búsqueda heurística.
 
 <h2>2. Enunciado del problema</h2>
 Paganitzu 1 es un videojuego arcade lanzado en los años 90, que está basado en el clásico juego del Sokoban 2. En él, el protagonista llamado Alabama o “Al” Smith se encuentra en un laberinto tipo grid. En la versión simplificada del juego que consideraremos, el objetivo es conseguir que Al recorra el laberinto recogiendo todas las llaves y, una vez recogidas, salga del laberinto. Para conseguir este objetivo, Al puede empujar las rocas en forma de bolas que aparecen y que obstaculizan sus movimientos. En el laberinto, también aparecen serpientes que disparan de forma horizontal si el protagonista cruza por delante, aunque no disparan si tienen un obstáculo (llave o roca) que obstaculice su visión. Por lo tanto, estas rocas también se pueden colocar delante de las serpientes para evitar ser disparados. Para entender mejor la dinámica del juego se recomienda jugar algunas partidas 3, aunque, como se ha comentado, en esta pra ́ctica consideraremos la versión simplificada del juego anteriormente descrita (i.e., no se consideran gemas, arañas, ni demás elementos del juego).
@@ -19,9 +19,10 @@ Para esta parte se pide:
 
 <li>Modelar el problema como un problema de satisfacibilidad lógica, en Forma Normal Conjuntiva (CNF).<li>
 Utilizando JaCoP, desarrollar un programa que codifique el modelo anterior y determine dónde colocar a Al y las serpientes. La implementación desarrollada se deberá ejecutar desde una consola o terminal con el siguiente comando:<br>
-```
+
+``
 java SATPaganitzu <laberinto> n
-```
+``
 <br> donde:
 <ul>
 <li>laberinto: es el nombre del fichero que contiene un laberinto en el formato indicado en la Figura 2 pero vacío, es decir, sólo indicando las paredes, llaves, salida y las rocas. Un ejemplo de nombre para este fichero podría ser lab1 parte1.lab.</li>
