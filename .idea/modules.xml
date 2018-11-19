@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Heuristica_p2.iml" filepath="$PROJECT_DIR$/Heuristica_p2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/javinsky/javinsky.iml" filepath="$PROJECT_DIR$/javinsky/javinsky.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kleinman/kleinman.iml" filepath="$PROJECT_DIR$/kleinman/kleinman.iml" />
     </modules>
   </component>
 </project>
