@@ -99,7 +99,7 @@ public class SATPaganitzu {
             }
         }
 
-        int literalSnake [][]= new int [row][col];
+        int literalSnake [][][]= new int [row][col][numSnakes];
 
         for (int i = 0; i < snake.length; i ++) {
 
@@ -115,7 +115,7 @@ public class SATPaganitzu {
                         satWrapper.register(snake[i][j][k]);
 
                         /* Obtenemos los literales no negados de las variables */
-                        literalSnake[i][j] = satWrapper.cpVarToBoolVar(snake[i][j][k], 1, true);
+                        literalSnake[i][j][k] = satWrapper.cpVarToBoolVar(snake[i][j][k], 1, true);
                     }
                 }
             }
@@ -137,19 +137,41 @@ public class SATPaganitzu {
         Restricciones explicitas
 
             1. Al y las serpientes solo se pueden colocar en celdas vacias.
-            2. Una serpiente no puede estar en la misma fila que otra serpiente.
-            3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al.
+            2. Una serpiente no puede estar en la misma fila que otra serpiente. -> DONE
+            3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al. -> DONE
 
         Restricciones implicitas
 
-            1. Al solo puede aparecer una vez
+            1. Al solo puede aparecer una vez -> DONE
             2. Es obligatorio que Al aparezca
-            3. Cada serpiente solo puede aparecer una vez
+            3. Cada serpiente solo puede aparecer una vez -> DONE
             4. Es obligatorio que aparezcan todas las serpientes
             5. No puede haber mas serpientes que filas
 
         */
 
+
+        //Restricciones explicitas
+
+        // 2. Una serpiente no puede estar en la misma fila que otra serpiente
+        snakesForRow(satWrapper, literalSnake);
+
+        // 3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al.
+        deployAlSnakes (satWrapper, literalSnake, literalProtagonist);
+
+
+        //Restricciones implicitas
+
+
+        // 1. Al solo puede aparecer una vez
+        deployProtagonistOnce (satWrapper, literalProtagonist);
+
+        // 3. Cada serpiente solo puede aparecer una vez
+
+        for (int i = 0; i < numSnakes; i ++) {
+
+            deploySnakeOnce (satWrapper, literalSnake, i);
+        }
 
 
 
@@ -178,5 +200,98 @@ public class SATPaganitzu {
 
     public static int[][] readFile(String file) throws IOException {
       return ;
+    }
+
+    public static void deployProtagonistOnce (SatWrapper satWrapper, int literal[][]) {
+
+        IntVec clause = new IntVec (satWrapper.pool);
+
+        for (int i = 0; i < literal.length; i ++) {
+
+            for (int j = 0; j < literal[0].length; j ++) {
+
+                if (literal [i][j] != 0) {
+
+                    clause.add(literal[i][j]);
+                }
+            }
+        }
+        satWrapper.addModelClause(clause.toArray());
+    }
+
+    public static void deploySnakeOnce (SatWrapper satWrapper, int literal[][][], int k){
+
+        IntVec clause = new IntVec(satWrapper.pool);
+
+        for (int i = 0; i < literal.length; i ++) {
+
+            for (int j = 0; j < literal[0].length; j ++) {
+
+                if (literal[i][j][k] != 0) {
+
+                    clause.add(literal[i][j][k]);
+                }
+            }
+        }
+        satWrapper.addModelClause(clause.toArray());
+    }
+
+
+    public static void snakesForRow (SatWrapper satWrapper, int literalSnake[][][]) {
+
+        for (int i = 0; i < literalSnake[0][0].length; i ++){ //Recorrido de una serpiente
+
+            for (int j = 0; j < literalSnake.length; j ++) { //Recorrido de la posicion "x" de la primera serpiente
+
+                for (int k = 0; k < literalSnake[0].length; k ++) { //Recorrido de la posicion "y" de la primera serpiente
+
+                    for (int l = 0; l < literalSnake[0][0].length; l ++) { //Recorrido de otra serpiente de la seguna serpiente
+
+                        if (l != i) { //Comprobacion de que la segunda serpiente sea distinta a la primera
+
+                            for (int m = 0; m < literalSnake[0].length; m ++) { //Recorrido de la posicion "y" de la seguna serpiente
+
+                                IntVec clause = new IntVec (satWrapper.pool);
+
+                                //Una serpiente no puede estar en la misma fila que otra distinta
+
+                                clause.add (-literalSnake[j][k][i]); //primera serpiente en la posición j(x), k(y), i(primera serpiente)
+
+                                clause.add (-literalSnake[j][m][l]); //primera serpiente en la posición j(x), m(y), l(segunda serpiente)
+
+                                satWrapper.addModelClause (clause.toArray()); //añadir
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    public static void deployAlSnakes (SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]) {
+
+        for (int i = 0; i < literalSnake[0][0].length; i++) { //Recorrido de una serpiente
+
+            for (int j = 0; j < literalSnake.length; j++) { //Recorrido de la posicion "x" de la primera serpiente
+
+                //Recorrido de la posicion "y" de la primera serpiente
+                for (int k = 0; k < literalSnake[0].length; k++) {
+
+                    for (int l = 0; l < literalSnake[0][0].length; l++) { //Recorrido de otra serpiente de la seguna serpiente
+
+                        IntVec clause1 = new IntVec(satWrapper.pool);
+
+                        //una serpiente no puede estar ni en la misma fila ni columna que el protagonista
+
+                        clause1.add(-literalSnake[j][k][l]);
+
+                        clause1.add(-literalProtagonist[j][k]);
+
+                        satWrapper.addModelClause(clause1.toArray());
+                    }
+                }
+            }
+        }
     }
 }

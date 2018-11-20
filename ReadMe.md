@@ -18,7 +18,7 @@ Para esta parte se pide:
 <ul>
 
 <li>Modelar el problema como un problema de satisfacibilidad lógica, en Forma Normal Conjuntiva (CNF).<li>
-Utilizando JaCoP, desarrollar un programa que codifique el modelo anterior y determine dónde colocar a Al y las serpientes. La implementación desarrollada se deberá ejecutar desde una consola o terminal con el siguiente comando:<br>
+Utilizando JaCoP, desarrollar un programa que codifique el modelo anterior y determine dónde colocar a Al y las serpientes. La implementación desarrollada se deberá ejecutar desde una consola o terminal con el siguiente comando:
 
 ``
 java SATPaganitzu <laberinto> n
