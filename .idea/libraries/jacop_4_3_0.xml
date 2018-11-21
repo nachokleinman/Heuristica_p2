@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="jacop-4.6">
+  <library name="jacop-4.3.0">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Desktop/jacop-4.6.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/Seguridad/jacop-4.3.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

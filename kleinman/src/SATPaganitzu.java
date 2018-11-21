@@ -21,17 +21,24 @@ import org.jacop.search.SmallestDomain;
 public class SATPaganitzu {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main (String[] args) throws IOException {
 
-        System.out.println("hola");
+        System.out.println("Inicio");
+
 
         //Fichero captado de los argumentos
         File file = new File(args[0]);
 
+
         //Lectura del fichero que es guardado en una matriz
         int initMap[][] = readFile(file.getPath());
 
+        System.out.println("lectura del fichero2");
+
         showMatrix(initMap);
+
+
+
 
         //Numero de serpientes pasadas por parametro
         int numSnakes = Integer.parseInt(args[1]);
@@ -158,6 +165,8 @@ public class SATPaganitzu {
         // 2. Una serpiente no puede estar en la misma fila que otra serpiente
         snakesForRow(satWrapper, literalSnake);
 
+        System.out.println("restriccion serpiente");
+
         // 3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al.
         deployAlSnakes (satWrapper, literalSnake, literalProtagonist);
 
@@ -174,6 +183,9 @@ public class SATPaganitzu {
 
             deploySnakeOnce (satWrapper, literalSnake, i);
         }
+
+
+        System.out.println("resolucion");
 
         /* Resolvemos el problema */
         Search <BooleanVar> search = new DepthFirstSearch<>();
@@ -218,10 +230,17 @@ public class SATPaganitzu {
             }
         } else System.out.println ("Error");
 
-        writeFile (initMap, args[0]);
+        System.out.println("resolucion hecha");
 
+        writeFile (initMap, args[0]);
+        System.out.println("impresion: ");
+
+        showMatrix(initMap);
+
+        //end of the main method
 
     }
+
 
 
 
@@ -231,7 +250,7 @@ public class SATPaganitzu {
 
             for (int j = 0; j < resultMap[0].length; j++) {
 
-                System.out.print((char) aResultMap[j] + " ");
+                System.out.print((char) aResultMap[j]);
             }
 
             System.out.println();
@@ -239,7 +258,7 @@ public class SATPaganitzu {
     }
 
 
-    private static int[][] readFile(String file) throws IOException {
+    private static int[][] readFile (String file) throws IOException {
 
         FileReader fileReader = new FileReader(file);
 
@@ -270,9 +289,11 @@ public class SATPaganitzu {
 
         }
 
-        fileReader.reset();
+        fileReader.close();
 
-        int reading = fileReader.read();
+        FileReader fileReader2 = new FileReader(file);
+
+        int reading = fileReader2.read();
 
         int matrix [][] = new int [row] [col];
 
@@ -286,16 +307,16 @@ public class SATPaganitzu {
 
                 if (reading == 10) {
 
-                    reading = fileReader.read();
+                    reading = fileReader2.read();
                 }
 
                 matrix[i][j] = reading;
 
-                reading = fileReader.read();
+                reading = fileReader2.read();
             }
         }
 
-        fileReader.close();
+        fileReader2.close();
 
         return matrix;
     }
