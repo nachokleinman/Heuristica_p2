@@ -1,9 +1,10 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 import org.jacop.core.BooleanVar;
 import org.jacop.core.Store;
@@ -16,10 +17,13 @@ import org.jacop.search.SelectChoicePoint;
 import org.jacop.search.SimpleSelect;
 import org.jacop.search.SmallestDomain;
 
+
 public class SATPaganitzu {
 
 
     public static void main(String[] args) throws IOException {
+
+        System.out.println("hola");
 
         //Fichero captado de los argumentos
         File file = new File(args[0]);
@@ -27,8 +31,7 @@ public class SATPaganitzu {
         //Lectura del fichero que es guardado en una matriz
         int initMap[][] = readFile(file.getPath());
 
-        //Matriz copiada de la matriz incial con la que se trabara en el programa
-        int resultMap[][] = initMap;
+        showMatrix(initMap);
 
         //Numero de serpientes pasadas por parametro
         int numSnakes = Integer.parseInt(args[1]);
@@ -40,7 +43,6 @@ public class SATPaganitzu {
         int col = initMap[0].length;
 
 
-        showMatrix(resultMap);
 
         Store store = new Store();
 
@@ -90,10 +92,10 @@ public class SATPaganitzu {
 
                     allVariables[allVar] = protagonist[i][j];
 
-                    /* Registramos las variables en el sat wrapper */
+                    // Registramos las variables en el sat wrapper
                     satWrapper.register (protagonist [i][j]);
 
-                    /* Obtenemos los literales no negados de las variables */
+                    // Obtenemos los literales no negados de las variables
                     literalProtagonist [i][j] = satWrapper.cpVarToBoolVar (protagonist[i][j], 1, true);
                 }
             }
@@ -111,10 +113,10 @@ public class SATPaganitzu {
 
                         allVariables[allVar] = snake[i][j][k];
 
-                        /* Registramos las variables en el sat wrapper */
+                        //Registramos las variables en el sat wrapper
                         satWrapper.register(snake[i][j][k]);
 
-                        /* Obtenemos los literales no negados de las variables */
+                        //Obtenemos los literales no negados de las variables
                         literalSnake[i][j][k] = satWrapper.cpVarToBoolVar(snake[i][j][k], 1, true);
                     }
                 }
@@ -173,63 +175,180 @@ public class SATPaganitzu {
             deploySnakeOnce (satWrapper, literalSnake, i);
         }
 
+        /* Resolvemos el problema */
+        Search <BooleanVar> search = new DepthFirstSearch<>();
 
+        SelectChoicePoint <BooleanVar> select = new SimpleSelect<>(allVariables, new SmallestDomain<>(), new IndomainMin<>());
 
+        Boolean result = search.labeling (store, select);
+
+        if (result) {
+
+            System.out.println ("Solution: ");
+
+            for (BooleanVar[] aProtagonist : protagonist) {
+
+                for (int j = 0; j < protagonist[0].length; j++) {
+
+                    if (aProtagonist[j] != null) {
+
+                        if (aProtagonist[j].dom().value() == 1) {
+
+                            System.out.println(aProtagonist[j].id());
+                        }
+                    }
+                }
+            }
+
+            for (BooleanVar[][] aSnake : snake) {
+
+                for (int j = 0; j < snake[0].length; j++) {
+
+                    for (int k = 0; k < snake[0][0].length; k++) {
+
+                        if (aSnake[j][k] != null) {
+
+                            if (aSnake[j][k].dom().value() == 1) {
+
+                                System.out.println(aSnake[j][k].id());
+                            }
+                        }
+                    }
+                }
+            }
+        } else System.out.println ("Error");
+
+        writeFile (initMap, args[0]);
 
 
     }
 
 
 
+    private static void showMatrix(int resultMap[][]) {
 
-    public static void showMatrix (int resultMap [][]) {
+        for (int[] aResultMap : resultMap) {
 
-        int row = resultMap.length;
+            for (int j = 0; j < resultMap[0].length; j++) {
 
-        int col = resultMap[0].length;
-
-        for (int i = 0; i < row; i ++) {
-
-            for (int j = 0; j < col; j++) {
-
+                System.out.print((char) aResultMap[j] + " ");
             }
+
             System.out.println();
         }
     }
 
 
-    public static int[][] readFile(String file) throws IOException {
-      return ;
+    private static int[][] readFile(String file) throws IOException {
+
+        FileReader fileReader = new FileReader(file);
+
+        int row = 0, col = 0, counter = 0, readed = fileReader.read();
+
+        try {
+            while (readed != -1) {
+                if (readed == 10) {
+                    row++;
+                    col = counter;
+                    counter = 0;
+                } else {
+                    counter++;
+                }
+                readed = fileReader.read();
+            }
+        } catch (FileNotFoundException e) {
+
+            System.out.println ("Unable to open file '" + fileReader + "'");
+
+            fileReader.close();
+
+        } catch (IOException e) {
+
+            System.out.println ("Error reading file '" + fileReader + "'");
+
+            fileReader.close();
+
+        }
+
+        fileReader.reset();
+
+        int reading = fileReader.read();
+
+        int matrix [][] = new int [row] [col];
+
+        for (int i = 0; i < row; i ++) {
+
+            for (int j =0; j < col; j ++) {
+
+                if (reading == -1) {
+                    break;
+                }
+
+                if (reading == 10) {
+
+                    reading = fileReader.read();
+                }
+
+                matrix[i][j] = reading;
+
+                reading = fileReader.read();
+            }
+        }
+
+        fileReader.close();
+
+        return matrix;
     }
 
-    public static void deployProtagonistOnce (SatWrapper satWrapper, int literal[][]) {
+    private static void writeFile(int[][] matrix, String file) throws IOException {
+
+        String d = file.concat (".output");
+
+        FileWriter fileWriter = new FileWriter (d);
+
+        BufferedWriter bufferWriter = new BufferedWriter (fileWriter);
+
+        PrintWriter writer = new PrintWriter (bufferWriter);
+
+        for (int[] aMatrix : matrix) {
+
+            for (int j = 0; j < matrix[0].length; j++) {
+
+                writer.write(aMatrix[j]);
+            }
+            writer.write("\n");
+        }
+        writer.close();
+    }
+
+    private static void deployProtagonistOnce(SatWrapper satWrapper, int literal[][]) {
 
         IntVec clause = new IntVec (satWrapper.pool);
 
-        for (int i = 0; i < literal.length; i ++) {
+        for (int[] aLiteral : literal) {
 
-            for (int j = 0; j < literal[0].length; j ++) {
+            for (int j = 0; j < literal[0].length; j++) {
 
-                if (literal [i][j] != 0) {
+                if (aLiteral[j] != 0) {
 
-                    clause.add(literal[i][j]);
+                    clause.add(aLiteral[j]);
                 }
             }
         }
         satWrapper.addModelClause(clause.toArray());
     }
 
-    public static void deploySnakeOnce (SatWrapper satWrapper, int literal[][][], int k){
+    private static void deploySnakeOnce(SatWrapper satWrapper, int literal[][][], int k){
 
         IntVec clause = new IntVec(satWrapper.pool);
 
-        for (int i = 0; i < literal.length; i ++) {
+        for (int[][] aLiteral : literal) {
 
-            for (int j = 0; j < literal[0].length; j ++) {
+            for (int j = 0; j < literal[0].length; j++) {
 
-                if (literal[i][j][k] != 0) {
+                if (aLiteral[j][k] != 0) {
 
-                    clause.add(literal[i][j][k]);
+                    clause.add(aLiteral[j][k]);
                 }
             }
         }
@@ -237,29 +356,29 @@ public class SATPaganitzu {
     }
 
 
-    public static void snakesForRow (SatWrapper satWrapper, int literalSnake[][][]) {
+    private static void snakesForRow(SatWrapper satWrapper, int literalSnake[][][]) {
 
         for (int i = 0; i < literalSnake[0][0].length; i ++){ //Recorrido de una serpiente
 
-            for (int j = 0; j < literalSnake.length; j ++) { //Recorrido de la posicion "x" de la primera serpiente
+            for (int[][] aLiteralSnake : literalSnake) { //Recorrido de la posicion "x" de la primera serpiente
 
-                for (int k = 0; k < literalSnake[0].length; k ++) { //Recorrido de la posicion "y" de la primera serpiente
+                for (int k = 0; k < literalSnake[0].length; k++) { //Recorrido de la posicion "y" de la primera serpiente
 
-                    for (int l = 0; l < literalSnake[0][0].length; l ++) { //Recorrido de otra serpiente de la seguna serpiente
+                    for (int l = 0; l < literalSnake[0][0].length; l++) { //Recorrido de otra serpiente de la seguna serpiente
 
                         if (l != i) { //Comprobacion de que la segunda serpiente sea distinta a la primera
 
-                            for (int m = 0; m < literalSnake[0].length; m ++) { //Recorrido de la posicion "y" de la seguna serpiente
+                            for (int m = 0; m < literalSnake[0].length; m++) { //Recorrido de la posicion "y" de la seguna serpiente
 
-                                IntVec clause = new IntVec (satWrapper.pool);
+                                IntVec clause = new IntVec(satWrapper.pool);
 
                                 //Una serpiente no puede estar en la misma fila que otra distinta
 
-                                clause.add (-literalSnake[j][k][i]); //primera serpiente en la posición j(x), k(y), i(primera serpiente)
+                                clause.add(-aLiteralSnake[k][i]); //primera serpiente en la posición j(x), k(y), i(primera serpiente)
 
-                                clause.add (-literalSnake[j][m][l]); //primera serpiente en la posición j(x), m(y), l(segunda serpiente)
+                                clause.add(-aLiteralSnake[m][l]); //primera serpiente en la posición j(x), m(y), l(segunda serpiente)
 
-                                satWrapper.addModelClause (clause.toArray()); //añadir
+                                satWrapper.addModelClause(clause.toArray()); //añadir
                             }
                         }
                     }
@@ -269,7 +388,7 @@ public class SATPaganitzu {
     }
 
 
-    public static void deployAlSnakes (SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]) {
+    private static void deployAlSnakes(SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]) {
 
         for (int i = 0; i < literalSnake[0][0].length; i++) { //Recorrido de una serpiente
 
