@@ -71,13 +71,16 @@ public class SATPaganitzu {
 
             for (int j = 0; j < initMap[0].length; j ++) {
 
-                protagonist[i][j] = new BooleanVar(store, "Posición: " + i + ", " + j);
-                counterProtagonist ++;
+
+                    protagonist[i][j] = new BooleanVar(store, "Protagonista en la posición: " + i + ", " + j);
+                    counterProtagonist++;
+
 
                 for (int k = 0; k < numSnakes; k ++) {
 
-                    snake[i][j][k] = new BooleanVar(store, "Serpiente " + k + " en la posición" + i + ", " + j);
-                    counterSnake ++;
+                        snake[i][j][k] = new BooleanVar(store, "Serpiente " + k + " en la posición " + i + ", " + j);
+                        counterSnake++;
+
                 }
             }
         }
@@ -104,6 +107,8 @@ public class SATPaganitzu {
 
                     // Obtenemos los literales no negados de las variables
                     literalProtagonist [i][j] = satWrapper.cpVarToBoolVar (protagonist[i][j], 1, true);
+
+                    allVar ++;
                 }
             }
         }
@@ -125,6 +130,8 @@ public class SATPaganitzu {
 
                         //Obtenemos los literales no negados de las variables
                         literalSnake[i][j][k] = satWrapper.cpVarToBoolVar(snake[i][j][k], 1, true);
+
+                        allVar ++;
                     }
                 }
             }
@@ -185,44 +192,59 @@ public class SATPaganitzu {
         }
 
 
-        System.out.println("resolucion");
+        System.out.println("Resolucion...");
 
         /* Resolvemos el problema */
-        Search <BooleanVar> search = new DepthFirstSearch<>();
 
-        SelectChoicePoint <BooleanVar> select = new SimpleSelect<>(allVariables, new SmallestDomain<>(), new IndomainMin<>());
+        Search<BooleanVar> search = new DepthFirstSearch <>();
+        System.out.println("1");
 
-        Boolean result = search.labeling (store, select);
+        SelectChoicePoint <BooleanVar> select = new SimpleSelect <> (allVariables, new SmallestDomain <>(), new IndomainMin <>());
+
+
+        System.out.println(select);
+        System.out.println("2");
+
+
+        Boolean result = search.labeling(store, select);
+        System.out.println("3");
+
 
         if (result) {
 
-            System.out.println ("Solution: ");
+            System.out.println ("Protagonist: ");
 
-            for (BooleanVar[] aProtagonist : protagonist) {
+            for (int i = 0; i < protagonist.length; i++) {
 
                 for (int j = 0; j < protagonist[0].length; j++) {
 
-                    if (aProtagonist[j] != null) {
+                    if (protagonist[i][j] != null) {
 
-                        if (aProtagonist[j].dom().value() == 1) {
+                        if (protagonist[i][j].dom().value() == 1) {
 
-                            System.out.println(aProtagonist[j].id());
+                            System.out.println(protagonist[i][j].id());
+
+                            initMap [i][j] = 65; //Colocar una 'A' (ASCII) para representar a Al
                         }
                     }
                 }
             }
 
-            for (BooleanVar[][] aSnake : snake) {
+            System.out.println ("snakes");
+
+            for (int i = 0; i < snake.length; i++) {
 
                 for (int j = 0; j < snake[0].length; j++) {
 
                     for (int k = 0; k < snake[0][0].length; k++) {
 
-                        if (aSnake[j][k] != null) {
+                        if (snake[i][j][k] != null) {
 
-                            if (aSnake[j][k].dom().value() == 1) {
+                            if (snake[i][j][k].dom().value() == 1) {
 
-                                System.out.println(aSnake[j][k].id());
+                                System.out.println(snake[i][j][k].id());
+
+                                initMap[i][j] = 83; //Colocar una 'S' (ASCII) por cada serpiente
                             }
                         }
                     }
@@ -232,14 +254,17 @@ public class SATPaganitzu {
 
         System.out.println("resolucion hecha");
 
+
+        System.out.println("creación del fichero: \n");
+
         writeFile (initMap, args[0]);
-        System.out.println("impresion: ");
-
-        showMatrix(initMap);
-
-        //end of the main method
 
     }
+
+    //FIN DEL METODO MAIN
+
+
+
 
 
 
@@ -323,23 +348,20 @@ public class SATPaganitzu {
 
     private static void writeFile(int[][] matrix, String file) throws IOException {
 
-        String d = file.concat (".output");
+        PrintWriter writer = new PrintWriter(new FileWriter( file + ".output"));
 
-        FileWriter fileWriter = new FileWriter (d);
-
-        BufferedWriter bufferWriter = new BufferedWriter (fileWriter);
-
-        PrintWriter writer = new PrintWriter (bufferWriter);
-
-        for (int[] aMatrix : matrix) {
+        for (int i = 0; i < matrix.length; i ++) {
 
             for (int j = 0; j < matrix[0].length; j++) {
 
-                writer.write(aMatrix[j]);
+                writer.write(matrix[i][j]);
+
             }
             writer.write("\n");
         }
+
         writer.close();
+
     }
 
     private static void deployProtagonistOnce(SatWrapper satWrapper, int literal[][]) {
