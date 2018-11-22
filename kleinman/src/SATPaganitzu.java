@@ -21,27 +21,25 @@ import org.jacop.search.SmallestDomain;
 public class SATPaganitzu {
 
 
-    public static void main (String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         System.out.println("Inicio");
-
 
         //Fichero captado de los argumentos
         File file = new File(args[0]);
 
-
         //Lectura del fichero que es guardado en una matriz
         int initMap[][] = readFile(file.getPath());
 
-        System.out.println("lectura del fichero2");
+        System.out.println("Lectura del fichero:");
 
         showMatrix(initMap);
 
-
-
-
         //Numero de serpientes pasadas por parametro
         int numSnakes = Integer.parseInt(args[1]);
+
+        System.out.println("Numero de serpientes a meter: " + numSnakes + "\n");
+
 
         //Numero de filas
         int row = initMap.length;
@@ -49,7 +47,19 @@ public class SATPaganitzu {
         //Numero de columnas en la fila cero
         int col = initMap[0].length;
 
+        System.out.println("filas" + row);
+        System.out.println("columnas" + col);
 
+        int espacioBlanco = 0;
+
+        for (int i = 0; i < initMap.length; i++) {
+
+            for (int j = 0; j < initMap[0].length; j++) {
+
+                if (initMap[i][j] == 32) espacioBlanco++;
+            }
+        }
+        System.out.println("Numero de espacios en blanco: " + espacioBlanco);
 
         Store store = new Store();
 
@@ -58,8 +68,9 @@ public class SATPaganitzu {
         store.impose(satWrapper);   /* Importante: sat problem */
 
 
-        //contadores de movimiento de las variables
-        int counterProtagonist =0, counterSnake = 0;
+        //Contadores de movimiento de las variables
+
+        int counterProtagonist = 0, counterSnake = 0;
 
         //Creacion de las variables booleanas. Una para protagonista y otra para las serpientes
 
@@ -67,61 +78,71 @@ public class SATPaganitzu {
 
         BooleanVar snake[][][] = new BooleanVar[row][col][numSnakes];
 
-        for (int i = 0; i < initMap.length; i ++) {
+        for (int i = 0; i < initMap.length; i++) {
 
-            for (int j = 0; j < initMap[0].length; j ++) {
+            for (int j = 0; j < initMap[0].length; j++) {
 
+
+                if (initMap[i][j] == 32) { //si está en espacio en blanco
 
                     protagonist[i][j] = new BooleanVar(store, "Protagonista en la posición: " + i + ", " + j);
+
+
                     counterProtagonist++;
+                }
 
+                for (int k = 0; k < numSnakes; k++) {
 
-                for (int k = 0; k < numSnakes; k ++) {
+                    if (initMap[i][j] == 32) {
 
                         snake[i][j][k] = new BooleanVar(store, "Serpiente " + k + " en la posición " + i + ", " + j);
+
                         counterSnake++;
 
+                    }
                 }
+
             }
         }
 
         //Todas las variables: es necesario para el SimpleSelect
+
         int size = counterProtagonist + counterSnake;
 
         int allVar = 0;
 
         BooleanVar[] allVariables = new BooleanVar[size];
 
-        int literalProtagonist [][] = new int[row][col];
+        int literalProtagonist[][] = new int[row][col];
 
-        for (int i = 0; i < protagonist.length; i ++) {
+        for (int i = 0; i < protagonist.length; i++) {
 
-            for (int j = 0; j < protagonist[0].length; j ++) {
+            for (int j = 0; j < protagonist[0].length; j++) {
 
-                if (protagonist [i][j] != null) {
+                if (protagonist[i][j] != null) {
 
                     allVariables[allVar] = protagonist[i][j];
 
                     // Registramos las variables en el sat wrapper
-                    satWrapper.register (protagonist [i][j]);
+                    satWrapper.register(protagonist[i][j]);
 
                     // Obtenemos los literales no negados de las variables
-                    literalProtagonist [i][j] = satWrapper.cpVarToBoolVar (protagonist[i][j], 1, true);
+                    literalProtagonist[i][j] = satWrapper.cpVarToBoolVar(protagonist[i][j], 1, true);
 
-                    allVar ++;
+                    allVar++;
                 }
             }
         }
 
-        int literalSnake [][][]= new int [row][col][numSnakes];
+        int literalSnake[][][] = new int[row][col][numSnakes];
 
-        for (int i = 0; i < snake.length; i ++) {
+        for (int i = 0; i < snake.length; i++) {
 
-            for (int j = 0; j < snake[0].length; j ++) {
+            for (int j = 0; j < snake[0].length; j++) {
 
-                for (int k = 0; k < numSnakes; k ++) {
+                for (int k = 0; k < numSnakes; k++) {
 
-                    if (snake [i][j][k] != null) {
+                    if (snake[i][j][k] != null) {
 
                         allVariables[allVar] = snake[i][j][k];
 
@@ -131,7 +152,7 @@ public class SATPaganitzu {
                         //Obtenemos los literales no negados de las variables
                         literalSnake[i][j][k] = satWrapper.cpVarToBoolVar(snake[i][j][k], 1, true);
 
-                        allVar ++;
+                        allVar++;
                     }
                 }
             }
@@ -154,12 +175,12 @@ public class SATPaganitzu {
 
             1. Al y las serpientes solo se pueden colocar en celdas vacias.
             2. Una serpiente no puede estar en la misma fila que otra serpiente. -> DONE
-            3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al. -> DONE
+            3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al. ->
 
         Restricciones implicitas
 
             1. Al solo puede aparecer una vez -> DONE
-            2. Es obligatorio que Al aparezca
+            2. Es obligatorio que Al aparezca ->
             3. Cada serpiente solo puede aparecer una vez -> DONE
             4. Es obligatorio que aparezcan todas las serpientes
             5. No puede haber mas serpientes que filas
@@ -167,70 +188,67 @@ public class SATPaganitzu {
         */
 
 
-        //Restricciones explicitas
-
-        // 2. Una serpiente no puede estar en la misma fila que otra serpiente
-        snakesForRow(satWrapper, literalSnake);
-
-        System.out.println("restriccion serpiente");
-
-        // 3. No puede haber ninguna serpiente ni en la misma fila ni en la misma columna que Al.
-        deployAlSnakes (satWrapper, literalSnake, literalProtagonist);
+        deployProtagonistOnce(satWrapper, literalProtagonist, literalSnake);
 
 
-        //Restricciones implicitas
+       for (int i = 0; i < numSnakes; i++) {
 
-
-        // 1. Al solo puede aparecer una vez
-        deployProtagonistOnce (satWrapper, literalProtagonist);
-
-        // 3. Cada serpiente solo puede aparecer una vez
-
-        for (int i = 0; i < numSnakes; i ++) {
-
-            deploySnakeOnce (satWrapper, literalSnake, i);
+            deploySnakeOnce(satWrapper, literalSnake, i);
         }
+
+        snakesForRow(satWrapper, literalSnake, literalProtagonist);
+
+
+
+
+
+
+
+
+
 
 
         System.out.println("Resolucion...");
 
         /* Resolvemos el problema */
 
-        Search<BooleanVar> search = new DepthFirstSearch <>();
+        Search<BooleanVar> search = new DepthFirstSearch<>();
+
         System.out.println("1");
 
-        SelectChoicePoint <BooleanVar> select = new SimpleSelect <> (allVariables, new SmallestDomain <>(), new IndomainMin <>());
-
+        SelectChoicePoint<BooleanVar> select = new SimpleSelect<>(allVariables, new SmallestDomain<>(), new IndomainMin<>());
 
         System.out.println(select);
+
         System.out.println("2");
 
-
         Boolean result = search.labeling(store, select);
+
         System.out.println("3");
+
+        System.out.println("resultado: " + result);
 
 
         if (result) {
 
-            System.out.println ("Protagonist: ");
+            System.out.println("Protagonist: ");
 
             for (int i = 0; i < protagonist.length; i++) {
 
                 for (int j = 0; j < protagonist[0].length; j++) {
 
-                    if (protagonist[i][j] != null) {
+                    if (protagonist[i][j] == null  && protagonist[i][j].dom().value() == 1) {
 
-                        if (protagonist[i][j].dom().value() == 1) {
 
-                            System.out.println(protagonist[i][j].id());
+                            System.out.println (protagonist[i][j].id());
 
-                            initMap [i][j] = 65; //Colocar una 'A' (ASCII) para representar a Al
-                        }
+                            initMap[i][j] = 65; //Colocar una 'A' (ASCII) para representar a Al
+
                     }
                 }
             }
 
-            System.out.println ("snakes");
+            System.out.println("snakes: ");
 
             for (int i = 0; i < snake.length; i++) {
 
@@ -238,30 +256,122 @@ public class SATPaganitzu {
 
                     for (int k = 0; k < snake[0][0].length; k++) {
 
-                        if (snake[i][j][k] != null) {
+                        if (snake[i][j][k] != null && snake[i][j][k].dom().value() == 1) {
 
-                            if (snake[i][j][k].dom().value() == 1) {
+
 
                                 System.out.println(snake[i][j][k].id());
 
                                 initMap[i][j] = 83; //Colocar una 'S' (ASCII) por cada serpiente
-                            }
+
+
                         }
                     }
                 }
             }
-        } else System.out.println ("Error");
+        } else System.out.println("Error");
 
         System.out.println("resolucion hecha");
 
 
         System.out.println("creación del fichero: \n");
 
-        writeFile (initMap, args[0]);
+        writeFile(initMap, args[0]);
 
+        showMatrix(initMap);
+
+        espacioBlanco = 0;
+
+        for (int i = 0; i < initMap.length; i++) {
+
+            for (int j = 0; j < initMap[0].length; j++) {
+
+                if (initMap[i][j] == 32) espacioBlanco++;
+            }
+        }
+        System.out.println("Numero de espacios en blanco: " + espacioBlanco);
     }
 
     //FIN DEL METODO MAIN
+
+
+
+
+
+
+    private static void deployProtagonistOnce(SatWrapper satWrapper, int literalProtagonist[][], int literalSnakes[][][]) {
+
+        IntVec clause = new IntVec(satWrapper.pool);
+
+        for (int i = 0; i < literalProtagonist.length; i++) {
+
+            for (int j = 0; j < literalProtagonist[0].length; j++) {
+
+                    if (literalProtagonist[i][j] != 0) {
+
+                        clause.add(literalProtagonist[i][j]);
+
+                }
+            }
+        }
+    }
+
+    private static void deploySnakeOnce(SatWrapper satWrapper, int literalSnake[][][], int k) {
+
+        IntVec clause = new IntVec(satWrapper.pool);
+
+        for (int[][] aLiteral : literalSnake) {
+
+            for (int j = 0; j < literalSnake[0].length; j++) {
+
+                if (aLiteral[j][k] != 0) {
+
+                    clause.add(aLiteral[j][k]);
+                }
+            }
+        }
+        satWrapper.addModelClause(clause.toArray());
+    }
+
+
+    private static void snakesForRow(SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]) {
+
+        for (int i=0; i < literalSnake[0][0].length; i ++) {
+
+            for (int j=0; j < literalSnake.length; j ++){
+
+                for (int k=0; k < literalSnake[0].length; k ++) {
+
+                    for (int m=0; m < literalSnake[0][0].length; m ++) {
+
+                        if (i != m) {
+
+                            for (int l = 0; l < literalSnake[0].length; l++) {
+                                IntVec clause = new IntVec(satWrapper.pool);
+
+                                clause.add(-literalSnake[j][k][i]);
+                                clause.add(-literalSnake[j][l][m]);
+
+                                satWrapper.addModelClause(clause.toArray());
+                            }
+                        }
+                    }
+                    IntVec clause2 = new IntVec(satWrapper.pool);
+
+                    clause2.add(-literalProtagonist[j][k]);
+                    clause2.add(-literalSnake[j][k][i]);
+
+                    satWrapper.addModelClause(clause2.toArray());
+                }
+
+
+            }
+        }
+
+    }
+
+
+
 
 
 
@@ -283,7 +393,7 @@ public class SATPaganitzu {
     }
 
 
-    private static int[][] readFile (String file) throws IOException {
+    private static int[][] readFile(String file) throws IOException {
 
         FileReader fileReader = new FileReader(file);
 
@@ -302,13 +412,13 @@ public class SATPaganitzu {
             }
         } catch (FileNotFoundException e) {
 
-            System.out.println ("Unable to open file '" + fileReader + "'");
+            System.out.println("Unable to open file '" + fileReader + "'");
 
             fileReader.close();
 
         } catch (IOException e) {
 
-            System.out.println ("Error reading file '" + fileReader + "'");
+            System.out.println("Error reading file '" + fileReader + "'");
 
             fileReader.close();
 
@@ -320,11 +430,11 @@ public class SATPaganitzu {
 
         int reading = fileReader2.read();
 
-        int matrix [][] = new int [row] [col];
+        int matrix[][] = new int[row][col];
 
-        for (int i = 0; i < row; i ++) {
+        for (int i = 0; i < row; i++) {
 
-            for (int j =0; j < col; j ++) {
+            for (int j = 0; j < col; j++) {
 
                 if (reading == -1) {
                     break;
@@ -348,9 +458,9 @@ public class SATPaganitzu {
 
     private static void writeFile(int[][] matrix, String file) throws IOException {
 
-        PrintWriter writer = new PrintWriter(new FileWriter( file + ".output"));
+        PrintWriter writer = new PrintWriter(new FileWriter(file + ".output"));
 
-        for (int i = 0; i < matrix.length; i ++) {
+        for (int i = 0; i < matrix.length; i++) {
 
             for (int j = 0; j < matrix[0].length; j++) {
 
@@ -362,98 +472,5 @@ public class SATPaganitzu {
 
         writer.close();
 
-    }
-
-    private static void deployProtagonistOnce(SatWrapper satWrapper, int literal[][]) {
-
-        IntVec clause = new IntVec (satWrapper.pool);
-
-        for (int[] aLiteral : literal) {
-
-            for (int j = 0; j < literal[0].length; j++) {
-
-                if (aLiteral[j] != 0) {
-
-                    clause.add(aLiteral[j]);
-                }
-            }
-        }
-        satWrapper.addModelClause(clause.toArray());
-    }
-
-    private static void deploySnakeOnce(SatWrapper satWrapper, int literal[][][], int k){
-
-        IntVec clause = new IntVec(satWrapper.pool);
-
-        for (int[][] aLiteral : literal) {
-
-            for (int j = 0; j < literal[0].length; j++) {
-
-                if (aLiteral[j][k] != 0) {
-
-                    clause.add(aLiteral[j][k]);
-                }
-            }
-        }
-        satWrapper.addModelClause(clause.toArray());
-    }
-
-
-    private static void snakesForRow(SatWrapper satWrapper, int literalSnake[][][]) {
-
-        for (int i = 0; i < literalSnake[0][0].length; i ++){ //Recorrido de una serpiente
-
-            for (int[][] aLiteralSnake : literalSnake) { //Recorrido de la posicion "x" de la primera serpiente
-
-                for (int k = 0; k < literalSnake[0].length; k++) { //Recorrido de la posicion "y" de la primera serpiente
-
-                    for (int l = 0; l < literalSnake[0][0].length; l++) { //Recorrido de otra serpiente de la seguna serpiente
-
-                        if (l != i) { //Comprobacion de que la segunda serpiente sea distinta a la primera
-
-                            for (int m = 0; m < literalSnake[0].length; m++) { //Recorrido de la posicion "y" de la seguna serpiente
-
-                                IntVec clause = new IntVec(satWrapper.pool);
-
-                                //Una serpiente no puede estar en la misma fila que otra distinta
-
-                                clause.add(-aLiteralSnake[k][i]); //primera serpiente en la posición j(x), k(y), i(primera serpiente)
-
-                                clause.add(-aLiteralSnake[m][l]); //primera serpiente en la posición j(x), m(y), l(segunda serpiente)
-
-                                satWrapper.addModelClause(clause.toArray()); //añadir
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private static void deployAlSnakes(SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]) {
-
-        for (int i = 0; i < literalSnake[0][0].length; i++) { //Recorrido de una serpiente
-
-            for (int j = 0; j < literalSnake.length; j++) { //Recorrido de la posicion "x" de la primera serpiente
-
-                //Recorrido de la posicion "y" de la primera serpiente
-                for (int k = 0; k < literalSnake[0].length; k++) {
-
-                    for (int l = 0; l < literalSnake[0][0].length; l++) { //Recorrido de otra serpiente de la seguna serpiente
-
-                        IntVec clause1 = new IntVec(satWrapper.pool);
-
-                        //una serpiente no puede estar ni en la misma fila ni columna que el protagonista
-
-                        clause1.add(-literalSnake[j][k][l]);
-
-                        clause1.add(-literalProtagonist[j][k]);
-
-                        satWrapper.addModelClause(clause1.toArray());
-                    }
-                }
-            }
-        }
     }
 }
