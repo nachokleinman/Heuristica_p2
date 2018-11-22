@@ -188,7 +188,7 @@ public class SATPaganitzu {
         */
 
 
-        deployProtagonistOnce(satWrapper, literalProtagonist, literalSnake);
+        deployProtagonistOnce(satWrapper, literalProtagonist);
 
 
        for (int i = 0; i < numSnakes; i++) {
@@ -199,13 +199,7 @@ public class SATPaganitzu {
         snakesForRow(satWrapper, literalSnake, literalProtagonist);
 
 
-
-
-
-
-
-
-
+        differentColFil (satWrapper, literalSnake, literalProtagonist);
 
 
         System.out.println("Resolucion...");
@@ -214,19 +208,9 @@ public class SATPaganitzu {
 
         Search<BooleanVar> search = new DepthFirstSearch<>();
 
-        System.out.println("1");
-
         SelectChoicePoint<BooleanVar> select = new SimpleSelect<>(allVariables, new SmallestDomain<>(), new IndomainMin<>());
 
-        System.out.println(select);
-
-        System.out.println("2");
-
         Boolean result = search.labeling(store, select);
-
-        System.out.println("3");
-
-        System.out.println("resultado: " + result);
 
 
         if (result) {
@@ -237,12 +221,14 @@ public class SATPaganitzu {
 
                 for (int j = 0; j < protagonist[0].length; j++) {
 
-                    if (protagonist[i][j] == null  && protagonist[i][j].dom().value() == 1) {
+                    if (protagonist[i][j] != null) {
 
+                        if (protagonist[i][j].dom().value() == 1) {
 
-                            System.out.println (protagonist[i][j].id());
+                            System.out.println(protagonist[i][j].id());
 
                             initMap[i][j] = 65; //Colocar una 'A' (ASCII) para representar a Al
+                        }
 
                     }
                 }
@@ -256,13 +242,14 @@ public class SATPaganitzu {
 
                     for (int k = 0; k < snake[0][0].length; k++) {
 
-                        if (snake[i][j][k] != null && snake[i][j][k].dom().value() == 1) {
+                        if (snake[i][j][k] != null) {
 
-
+                            if (snake[i][j][k].dom().value() == 1) {
 
                                 System.out.println(snake[i][j][k].id());
 
                                 initMap[i][j] = 83; //Colocar una 'S' (ASCII) por cada serpiente
+                            }
 
 
                         }
@@ -289,17 +276,59 @@ public class SATPaganitzu {
                 if (initMap[i][j] == 32) espacioBlanco++;
             }
         }
+
         System.out.println("Numero de espacios en blanco: " + espacioBlanco);
     }
 
     //FIN DEL METODO MAIN
 
 
+    public static void differentColFil(SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]){
+
+        for (int j = 0; j < literalSnake.length; j++) {
+
+            for (int k = 0; k < literalSnake[0].length; k++) {
+
+                for (int l = 0; l < literalProtagonist.length; l++) {
+
+                    for (int m = 0; m < literalProtagonist[0].length; m++) {
+
+                        for (int i = 0; i < literalSnake[0][0].length; i++) {
+
+                            if (k != m ) {
+
+                                IntVec clause = new IntVec(satWrapper.pool);
+
+                                clause.add(-literalSnake[j][k][i]);
+
+                                clause.add(-literalProtagonist[j][m]);
+
+                                satWrapper.addModelClause(clause.toArray());
+
+                            }
+
+                            if (l != j ) {
+
+                                IntVec clause2 = new IntVec(satWrapper.pool);
+
+                                clause2.add(-literalSnake[j][k][i]);
+
+                                clause2.add(-literalProtagonist[j][k]);
+
+                                satWrapper.addModelClause(clause2.toArray());
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
 
 
-
-
-    private static void deployProtagonistOnce(SatWrapper satWrapper, int literalProtagonist[][], int literalSnakes[][][]) {
+    private static void deployProtagonistOnce(SatWrapper satWrapper, int literalProtagonist[][]) {
 
         IntVec clause = new IntVec(satWrapper.pool);
 
@@ -310,6 +339,7 @@ public class SATPaganitzu {
                     if (literalProtagonist[i][j] != 0) {
 
                         clause.add(literalProtagonist[i][j]);
+                        satWrapper.addModelClause(clause.toArray());
 
                 }
             }
@@ -331,6 +361,7 @@ public class SATPaganitzu {
             }
         }
         satWrapper.addModelClause(clause.toArray());
+
     }
 
 
@@ -363,18 +394,9 @@ public class SATPaganitzu {
 
                     satWrapper.addModelClause(clause2.toArray());
                 }
-
-
             }
         }
-
     }
-
-
-
-
-
-
 
 
 
