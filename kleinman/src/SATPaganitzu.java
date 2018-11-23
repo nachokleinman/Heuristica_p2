@@ -199,7 +199,10 @@ public class SATPaganitzu {
         snakesForRow(satWrapper, literalSnake, literalProtagonist);
 
 
-        differentColFil (satWrapper, literalSnake, literalProtagonist);
+        differentRowCol (satWrapper, literalSnake, literalProtagonist);
+
+
+
 
 
         System.out.println("Resolucion...");
@@ -283,7 +286,8 @@ public class SATPaganitzu {
     //FIN DEL METODO MAIN
 
 
-    public static void differentColFil(SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]){
+    public static void differentRowCol (SatWrapper satWrapper, int literalSnake[][][], int literalProtagonist[][]){
+
 
         for (int j = 0; j < literalSnake.length; j++) {
 
@@ -295,38 +299,32 @@ public class SATPaganitzu {
 
                         for (int i = 0; i < literalSnake[0][0].length; i++) {
 
-                            if (k != m ) {
+                            IntVec clause = new IntVec(satWrapper.pool);
 
-                                IntVec clause = new IntVec(satWrapper.pool);
-
-                                clause.add(-literalSnake[j][k][i]);
+                            if (j != l) {
 
                                 clause.add(-literalProtagonist[j][m]);
-
+                                clause.add(-literalSnake[j][k][i]);
                                 satWrapper.addModelClause(clause.toArray());
-
                             }
 
-                            if (l != j ) {
+                            clause = new IntVec(satWrapper.pool);
 
-                                IntVec clause2 = new IntVec(satWrapper.pool);
+                            if (k != m) {
 
-                                clause2.add(-literalSnake[j][k][i]);
-
-                                clause2.add(-literalProtagonist[j][k]);
-
-                                satWrapper.addModelClause(clause2.toArray());
-
+                                clause.add(-literalProtagonist[l][k]);
+                                clause.add(-literalSnake[j][k][i]);
+                                satWrapper.addModelClause(clause.toArray());
                             }
+
+
+
                         }
-
                     }
                 }
             }
         }
-
     }
-
 
     private static void deployProtagonistOnce(SatWrapper satWrapper, int literalProtagonist[][]) {
 
@@ -387,12 +385,7 @@ public class SATPaganitzu {
                             }
                         }
                     }
-                    IntVec clause2 = new IntVec(satWrapper.pool);
 
-                    clause2.add(-literalProtagonist[j][k]);
-                    clause2.add(-literalSnake[j][k][i]);
-
-                    satWrapper.addModelClause(clause2.toArray());
                 }
             }
         }
