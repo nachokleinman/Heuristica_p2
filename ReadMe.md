@@ -21,18 +21,17 @@ In the design of labyrinths, one of the problems that arise is where to initiall
 For this part it is requested:
 <ul>
 
-<The objective of the exercise is to model the problem as a problem of logical satisfaction, in Conjunctive Normal Form (CNF).<li>.
-Using JaCoP, develop a program that codes the previous model and determines where to place Al and the snakes. The implementation developed must be executed from a console or terminal with the following command:
-
+<li>The objective of the exercise is to model the problem as a problem of logical satisfaction, in Conjunctive Normal Form (CNF).</li>
+<li> Using JaCoP, develop a program that codes the previous model and determines where to place Al and the snakes. The implementation developed must be executed from a console or terminal with the following command:</li>
 
 ``
 java SATPaganitzu <maze> n
-``
+``<br> 
 
-<br> where:
+where:
 <ul>
 <li>labyrinth: is the name of the file that contains a labyrinth in the format indicated in Figure 2 but empty, that is, only indicating the walls, keys, exit and rocks. An example name for this file could be lab1 part1.lab.</li>
 <li>n: number of snakes to place in the labyrinth.
 In the case that the problem is satisfactory, the program will generate as output a labyrinth that will be written in a file using the format of Figure 2 that will contain, in addition to the initial elements, the n snakes and Al. The name of the generated file must be the name of the input file with extension .output (for example, lab1 part1.lab.output). If the problem is not satisfactory, a message will be printed on the screen informing of this fact.</li>.<br>
   
- In addition, test cases should be generated, i.e. some empty labyrinths of various sizes and shapes and with a different number of snakes to include in them.
+In addition, test cases should be generated, i.e. some empty labyrinths of various sizes and shapes and with a different number of snakes to include in them.
