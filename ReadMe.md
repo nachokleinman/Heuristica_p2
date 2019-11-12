@@ -1,6 +1,6 @@
 <h2>Heuristic exercise: logical satisfaction. JaCop </h1>
 
-<h2>1. Objective </h2> 
+<h2>1. Objective </h2>
 
 The objective of this practice is to learn to model and solve problems of both logical satisfaction (SAT) and heuristic search.
 
@@ -24,7 +24,7 @@ For this part it is requested:
 
 ``
 java SATPaganitzu <maze> n
-``<br> 
+``<br>
 
 where:
 <ul>
@@ -33,3 +33,49 @@ where:
 In the case that the problem is satisfactory, the program will generate as output a labyrinth that will be written in a file using the format of Figure 2 that will contain, in addition to the initial elements, the n snakes and Al. The name of the generated file must be the name of the input file with extension .output (for example, lab1 part1.lab.output). If the problem is not satisfactory, a message will be printed on the screen informing of this fact.</li><br>
 </ul></ul>
 In addition, test cases should be generated, i.e. some empty labyrinths of various sizes and shapes and with a different number of snakes to include in them.
+
+
+<h3> 2.2. Part 2: Heuristic Search.</h3>
+
+
+The problem proposed in this part is to calculate the minimum cost route that allows Al to collect all the keys and get out of the labyrinth, while avoiding being shot by snakes. To do this, Al can move between two contiguous horizontal or vertical cells as long as it is not prevented by a wall or obstacle that cannot pass through. In addition, you can push the rocks that stand in your way, or you can push them to place them in the line of sight of snakes and avoid being shot. To be able to push a rock, Al must be in an adjacent cell, and the cell to which you want to move the rock must be empty. When Al pushes a rock he goes on to occupy the cell that occupied the rock. The costs that are contemplated are the following:
+<ul>
+<li>An empty cell can be passed through at cost 2.</li>
+<li>Moving a rock costs 4.</li>
+</ul>
+
+In this part you ask:
+
+Model the problem of route calculation proposed as a heuristic search problem.
+To implement the __algorithm A*__ that allows to solve the problem and to implement two heuristic functions informed and admissible that estimate the remaining cost, so that they serve as guide for the algorithm. The developed implementation must be executed from a console or terminal with the following command:
+
+``
+java AstarPaganitzu <labyrinth> <heuristics>
+``<br>
+ where:
+
+ <ul>
+ <li>Labyrinth: Name of the file containing the labyrinth in the format specified in Figure 2. Example: lab1 part2.map.</li>
+ <li>Heuristica: Name of the heuristics.</li>
+ </ul>
+
+
+The possible values for the heuristic parameter must be detailed in the memory and in the help of the developed implementation. The program should generate two output files. Both must be generated in the same directory where the input labyrinth is located and must have the same name of the labyrinth (extension included) ma ́s an additional extension. The files are the following:
+
+
+<ul>
+<li>Labyrinth of exit: Must contain the route made by Al to collect all the keys and reach the exit. To do this, the entry labyrinth will be shown first, and immediately below the path followed by Al, for example, (0,0)→(0,1)→(1,1)→ . . ., where each of the positions (x, y) indicates the row x and column y where Al is. The extension ́n of this file must be '.output'. Example: lab1 part2.lab.output.</li>
+<li>Statistics file. This file must contain information related to the search process, such as total time, total cost, route length, expanded nodes, etc. For example,
+                  Total time: 145
+                  Total cost: 54
+                  Route length: 27
+                  Expanded nodes: 132
+The extension of this file must be '.statistics'. Example: lab1parte2.lab.statistics.</li>
+
+<li>Propose test cases on various labyrinths between those generated in the first part and those that are expressly generated for this part, and resolve them with the implementation developed. These cases should be generated reasonably depending on the efficiency achieved in the implementation.</li>
+
+
+<li>Perform a comparative study using the two heuristics implemented (number of expanded nodes, computation time, etc.).</li>
+
+<li>As an optional part of the problem, it is proposed to model and implement the diagonal movement between two contiguous boxes, implement a heuristic that considers this movement and a brief comparative analysis as a complement to the previous one. </li>
+</ul>
