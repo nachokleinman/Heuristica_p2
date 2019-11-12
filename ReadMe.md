@@ -9,7 +9,7 @@ Paganitzu 1 is an arcade video game released in the 90's, which is based on the 
 
 The labyrinth is made up of different cells, and in each cell you can find an element of the game: the protagonist, a snake, a rock, a wall or an obstacle that we cannot cross, the keys, the exit, or an empty cell. In the maps elaborated in this practice each of these elements will be represented with a different letter: 'A' for the protagonist, 'S' for the snakes, 'O' for the rocks, 'K' for the keys, 'E' for the exit of the labyrinth, '%' for the obsta ́culos that we cannot cross, and a blank space for the empty cells.<br>
 
-<h3> 2.1. Part 1: Labyrinth design with SAT</h3>>
+<h3> 2.1. Part 1: Labyrinth design with SAT</h3>
 In the design of labyrinths, one of the problems that arise is where to initially place the different elements of the game so that the labyrinth is attractive to players. To do this, it has been decided to automate the placement of the protagonist and snakes in a given labyrinth (i.e., the walls, rocks, keys, and exit are initially defined). The restrictions to take into account in this process are:
 <ol>
 <li>Al and snakes so ́lo can be placed in vac cells ́ıas.</li>
