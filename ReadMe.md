@@ -32,6 +32,6 @@ where:
 <ul>
 <li>labyrinth: is the name of the file that contains a labyrinth in the format indicated in Figure 2 but empty, that is, only indicating the walls, keys, exit and rocks. An example name for this file could be lab1 part1.lab.</li>
 <li>n: number of snakes to place in the labyrinth.
-In the case that the problem is satisfactory, the program will generate as output a labyrinth that will be written in a file using the format of Figure 2 that will contain, in addition to the initial elements, the n snakes and Al. The name of the generated file must be the name of the input file with extension .output (for example, lab1 part1.lab.output). If the problem is not satisfactory, a message will be printed on the screen informing of this fact.</li>.<br>
-  
+In the case that the problem is satisfactory, the program will generate as output a labyrinth that will be written in a file using the format of Figure 2 that will contain, in addition to the initial elements, the n snakes and Al. The name of the generated file must be the name of the input file with extension .output (for example, lab1 part1.lab.output). If the problem is not satisfactory, a message will be printed on the screen informing of this fact.</li><br>
+</ul>
 In addition, test cases should be generated, i.e. some empty labyrinths of various sizes and shapes and with a different number of snakes to include in them.
